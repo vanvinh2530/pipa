@@ -43,10 +43,8 @@ jobs:
           CROSS_COMPILE=aarch64-linux-android- \
           CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+    - name: Upload kernel artifact
+      uses: ./.github/actions/upload-artifact
       with:
-        name: MiPad6-Kernel
-        path: |
-          out/arch/arm64/boot/Image
-          out/arch/arm64/boot/dtb
+        name: kernel
+        path: out/arch/arm64/boot/
