@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout kernel source
-      uses: actions/checkout@v3
+      uses: actions/upload-artifact@f2132016cfcafc6106be4dbf2bde0396b4c0c4f2
 
     - name: Install dependencies
       run: |
