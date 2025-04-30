@@ -1,0 +1,52 @@
+name: Build Mi Pad 6 Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout kernel source
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y bc bison build-essential ccache curl flex git libncurses-dev libssl-dev \
+        python-is-python3 unzip zip zstd
+
+    - name: Download Clang
+      run: |
+        mkdir clang
+        wget https://github.com/ClangBuiltLinux/llvm-project/releases/download/clang-r450784d/clang-r450784d.tar.gz
+        tar -xf clang-r450784d.tar.gz -C clang
+        echo "CLANG_PATH=$PWD/clang/clang-r450784d" >> $GITHUB_ENV
+        echo "PATH=$PWD/clang/clang-r450784d/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Configure Kernel
+      run: |
+        export ARCH=arm64
+        export SUBARCH=arm64
+        make O=out pipa_user_defconfig
+
+    - name: Build Kernel
+      run: |
+        export ARCH=arm64
+        export SUBARCH=arm64
+        export PATH=$CLANG_PATH/bin:$PATH
+        make -j$(nproc) O=out \
+          ARCH=arm64 \
+          CC=clang \
+          CLANG_TRIPLE=aarch64-linux-gnu- \
+          CROSS_COMPILE=aarch64-linux-android- \
+          CROSS_COMPILE_ARM32=arm-linux-androideabi-
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: MiPad6-Kernel
+        path: |
+          out/arch/arm64/boot/Image
+          out/arch/arm64/boot/dtb
