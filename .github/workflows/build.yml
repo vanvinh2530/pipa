@@ -25,17 +25,17 @@ jobs:
         echo "CLANG_PATH=$PWD/clang/clang-r450784d" >> $GITHUB_ENV
         echo "PATH=$PWD/clang/clang-r450784d/bin:$PATH" >> $GITHUB_ENV
 
+    - name: Set environment variables
+      run: |
+        echo "ARCH=arm64" >> $GITHUB_ENV
+        echo "SUBARCH=arm64" >> $GITHUB_ENV
+
     - name: Configure Kernel
       run: |
-        export ARCH=arm64
-        export SUBARCH=arm64
         make O=out pipa_user_defconfig
 
     - name: Build Kernel
       run: |
-        export ARCH=arm64
-        export SUBARCH=arm64
-        export PATH=$CLANG_PATH/bin:$PATH
         make -j$(nproc) O=out \
           ARCH=arm64 \
           CC=clang \
@@ -44,7 +44,7 @@ jobs:
           CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3.1.3
       with:
         name: MiPad6-Kernel
         path: |
